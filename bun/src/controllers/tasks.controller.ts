@@ -4,33 +4,39 @@ import {
   createTaskSchema,
   updateTaskSchema,
 } from "@/validators/task.validator";
-import type { Task } from "@/types";
-
-// Mock data for now
-let tasks: Task[] = [
-  {
-    id: "1",
-    title: "Sample Task",
-    description: "This is a sample task",
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  },
-];
+import { supabase } from "@/config/supabase";
 
 export const getAllTasks = async (_req: Request, res: Response) => {
+  const { data: tasks, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new AppError(500, `Failed to fetch tasks: ${error.message}`);
+  }
+
   res.json({
     status: "success",
     data: tasks,
-    count: tasks.length,
+    count: tasks?.length || 0,
   });
 };
 
 export const getTaskById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const task = tasks.find((t) => t.id === id);
 
-  if (!task) {
-    throw new AppError(404, "Task not found");
+  const { data: task, error } = await supabase
+    .from("tasks")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    if (error.code === "PGRST116") {
+      throw new AppError(404, "Task not found");
+    }
+    throw new AppError(500, `Failed to fetch task: ${error.message}`);
   }
 
   res.json({
@@ -48,15 +54,19 @@ export const createTask = async (req: Request, res: Response) => {
 
   const { title, description } = result.data;
 
-  const newTask: Task = {
-    id: String(tasks.length + 1),
-    title,
-    description,
-    status: "pending",
-    createdAt: new Date().toISOString(),
-  };
+  const { data: newTask, error } = await supabase
+    .from("tasks")
+    .insert({
+      title,
+      description,
+      status: "pending",
+    })
+    .select()
+    .single();
 
-  tasks.push(newTask);
+  if (error) {
+    throw new AppError(500, `Failed to create task: ${error.message}`);
+  }
 
   res.status(201).json({
     status: "success",
@@ -72,33 +82,37 @@ export const updateTask = async (req: Request, res: Response) => {
     throw new AppError(400, result.error.errors[0].message);
   }
 
-  const taskIndex = tasks.findIndex((t) => t.id === id);
+  const { data: updatedTask, error } = await supabase
+    .from("tasks")
+    .update({
+      ...result.data,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .select()
+    .single();
 
-  if (taskIndex === -1) {
-    throw new AppError(404, "Task not found");
+  if (error) {
+    if (error.code === "PGRST116") {
+      throw new AppError(404, "Task not found");
+    }
+    throw new AppError(500, `Failed to update task: ${error.message}`);
   }
-
-  tasks[taskIndex] = {
-    ...tasks[taskIndex],
-    ...result.data,
-  };
 
   res.json({
     status: "success",
-    data: tasks[taskIndex],
+    data: updatedTask,
   });
 };
 
 export const deleteTask = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const taskIndex = tasks.findIndex((t) => t.id === id);
+  const { error } = await supabase.from("tasks").delete().eq("id", id);
 
-  if (taskIndex === -1) {
-    throw new AppError(404, "Task not found");
+  if (error) {
+    throw new AppError(500, `Failed to delete task: ${error.message}`);
   }
-
-  tasks.splice(taskIndex, 1);
 
   res.status(204).send();
 };

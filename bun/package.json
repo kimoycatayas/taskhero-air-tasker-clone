@@ -8,7 +8,8 @@
     "start": "bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
     "prod": "bun run dist/index.js",
-    "test:api": "bun run test-api.ts"
+    "test:api": "bun run test-api.ts",
+    "setup": "bun run setup.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -21,6 +22,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.86.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.2.1",
