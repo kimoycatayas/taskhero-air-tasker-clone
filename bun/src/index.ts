@@ -1,14 +1,35 @@
-import express, { type Request, type Response } from "express";
+import express, { type Application } from "express";
+import cors from "cors";
+import { config } from "@/config/env";
+import { errorHandler } from "@/middleware/error-handler";
+import { requestLogger } from "@/middleware/logger";
+import routes from "@/routes";
 
-const app = express();
-const port = process.env.PORT || 3000;
+const app: Application = express();
 
+// Middleware
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger);
 
-app.get("/", (req: Request, res: Response) => {
-  res.json({ message: "Hello from Bun + Express + TypeScript 👋" });
+// Routes
+app.use("/api", routes);
+
+// Health check
+app.get("/health", (_req, res) => {
+  res.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    environment: config.NODE_ENV,
+  });
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+// Error handling middleware (must be last)
+app.use(errorHandler);
+
+// Start server
+app.listen(config.PORT, () => {
+  console.log(`🚀 TaskHero API running on http://localhost:${config.PORT}`);
+  console.log(`📝 Environment: ${config.NODE_ENV}`);
 });
