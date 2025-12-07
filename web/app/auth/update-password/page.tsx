@@ -3,12 +3,11 @@
 import { useState, FormEvent, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { PAGE_ROUTES } from "@/src/constants/page-routes";
 
 export default function UpdatePasswordPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,7 +26,9 @@ export default function UpdatePasswordPage() {
       if (token && type === "recovery") {
         setAccessToken(token);
       } else {
-        setError("Invalid or expired reset link. Please request a new password reset.");
+        setError(
+          "Invalid or expired reset link. Please request a new password reset."
+        );
       }
     } else {
       setError("Invalid reset link. Please request a new password reset.");
@@ -75,12 +76,13 @@ export default function UpdatePasswordPage() {
     setLoading(true);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+      const API_URL =
+        process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
       const response = await fetch(`${API_URL}/api/auth/update-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ password }),
       });
@@ -92,13 +94,17 @@ export default function UpdatePasswordPage() {
       }
 
       setSuccess(true);
-      
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
         router.push(PAGE_ROUTES.login);
       }, 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update password. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to update password. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -115,9 +121,13 @@ export default function UpdatePasswordPage() {
             height={80}
             className="mx-auto mb-4"
           />
-          <h1 className="text-3xl font-bold text-[#1565C0] mb-2">Update Password</h1>
+          <h1 className="text-3xl font-bold text-[#1565C0] mb-2">
+            Update Password
+          </h1>
           <p className="text-gray-600">
-            {success ? "Password updated successfully!" : "Enter your new password"}
+            {success
+              ? "Password updated successfully!"
+              : "Enter your new password"}
           </p>
         </div>
 
@@ -129,7 +139,9 @@ export default function UpdatePasswordPage() {
 
         {success && (
           <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm">
-            <p className="font-semibold mb-1">✅ Password updated successfully!</p>
+            <p className="font-semibold mb-1">
+              ✅ Password updated successfully!
+            </p>
             <p className="text-xs mt-2">Redirecting to login page...</p>
           </div>
         )}
@@ -205,4 +217,3 @@ export default function UpdatePasswordPage() {
     </div>
   );
 }
-
