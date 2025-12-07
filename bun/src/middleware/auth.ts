@@ -7,7 +7,7 @@ import { AppError } from "@/middleware/error-handler";
  */
 export const requireAuth = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   try {
@@ -43,7 +43,7 @@ export const requireAuth = async (
  */
 export const optionalAuth = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   try {

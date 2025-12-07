@@ -4,7 +4,7 @@
  */
 
 import { supabase, supabaseAdmin } from "@/config/supabase";
-import type { TaskInsert, TaskUpdate } from "@/types";
+import type { TaskInsert } from "@/types";
 
 /**
  * Check if Supabase connection is healthy
