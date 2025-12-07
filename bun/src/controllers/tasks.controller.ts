@@ -6,11 +6,24 @@ import {
 } from "@/validators/task.validator";
 import { supabase } from "@/config/supabase";
 
-export const getAllTasks = async (_req: Request, res: Response) => {
-  const { data: tasks, error } = await supabase
+export const getAllTasks = async (req: Request, res: Response) => {
+  // Get user_id from authenticated user (if available)
+  const userId = req.user?.id;
+
+  let query = supabase
     .from("tasks")
     .select("*")
     .order("created_at", { ascending: false });
+
+  // If user is authenticated, only show their tasks
+  // If not authenticated, show tasks without user_id (for backward compatibility)
+  if (userId) {
+    query = query.eq("user_id", userId);
+  } else {
+    query = query.is("user_id", null);
+  }
+
+  const { data: tasks, error } = await query;
 
   if (error) {
     throw new AppError(500, `Failed to fetch tasks: ${error.message}`);
@@ -25,12 +38,18 @@ export const getAllTasks = async (_req: Request, res: Response) => {
 
 export const getTaskById = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const userId = req.user?.id;
 
-  const { data: task, error } = await supabase
-    .from("tasks")
-    .select("*")
-    .eq("id", id)
-    .single();
+  let query = supabase.from("tasks").select("*").eq("id", id);
+
+  // Filter by user_id if authenticated
+  if (userId) {
+    query = query.eq("user_id", userId);
+  } else {
+    query = query.is("user_id", null);
+  }
+
+  const { data: task, error } = await query.single();
 
   if (error) {
     if (error.code === "PGRST116") {
@@ -53,6 +72,7 @@ export const createTask = async (req: Request, res: Response) => {
   }
 
   const { title, description } = result.data;
+  const userId = req.user?.id || null;
 
   const { data: newTask, error } = await supabase
     .from("tasks")
@@ -60,6 +80,7 @@ export const createTask = async (req: Request, res: Response) => {
       title,
       description,
       status: "pending",
+      user_id: userId, // Associate task with user if authenticated
     })
     .select()
     .single();
@@ -82,15 +103,24 @@ export const updateTask = async (req: Request, res: Response) => {
     throw new AppError(400, result.error.errors[0].message);
   }
 
-  const { data: updatedTask, error } = await supabase
+  const userId = req.user?.id;
+
+  // Build query with user_id filter if authenticated
+  let query = supabase
     .from("tasks")
     .update({
       ...result.data,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", id)
-    .select()
-    .single();
+    .eq("id", id);
+
+  if (userId) {
+    query = query.eq("user_id", userId);
+  } else {
+    query = query.is("user_id", null);
+  }
+
+  const { data: updatedTask, error } = await query.select().single();
 
   if (error) {
     if (error.code === "PGRST116") {
@@ -107,8 +137,17 @@ export const updateTask = async (req: Request, res: Response) => {
 
 export const deleteTask = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const userId = req.user?.id;
 
-  const { error } = await supabase.from("tasks").delete().eq("id", id);
+  let query = supabase.from("tasks").delete().eq("id", id);
+
+  if (userId) {
+    query = query.eq("user_id", userId);
+  } else {
+    query = query.is("user_id", null);
+  }
+
+  const { error } = await query;
 
   if (error) {
     throw new AppError(500, `Failed to delete task: ${error.message}`);

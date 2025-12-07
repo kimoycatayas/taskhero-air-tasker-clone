@@ -1,8 +1,12 @@
 import { Router } from "express";
 import { asyncHandler } from "@/middleware/error-handler";
+import { optionalAuth } from "@/middleware/auth";
 import * as taskController from "@/controllers/tasks.controller";
 
 const router = Router();
+
+// Apply optional auth to all routes - works with or without authentication
+router.use(optionalAuth);
 
 router.get("/", asyncHandler(taskController.getAllTasks));
 router.get("/:id", asyncHandler(taskController.getTaskById));

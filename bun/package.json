@@ -9,6 +9,7 @@
     "build": "bun build src/index.ts --outdir dist --target bun",
     "prod": "bun run dist/index.js",
     "test:api": "bun run test-api.ts",
+    "test:auth": "bun run test-auth.ts",
     "setup": "bun run setup.ts"
   },
   "devDependencies": {

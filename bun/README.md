@@ -55,18 +55,30 @@ bun run prod
 bun/
 ├── src/
 │   ├── config/          # Configuration files
-│   │   └── env.ts       # Environment variables
+│   │   ├── env.ts       # Environment variables
+│   │   └── supabase.ts  # Supabase client
 │   ├── controllers/     # Request handlers
+│   │   ├── auth.controller.ts
 │   │   └── tasks.controller.ts
 │   ├── middleware/      # Express middleware
+│   │   ├── auth.ts      # JWT authentication
 │   │   ├── error-handler.ts
 │   │   └── logger.ts
 │   ├── routes/          # API routes
+│   │   ├── auth.routes.ts
 │   │   ├── index.ts
 │   │   └── tasks.routes.ts
 │   ├── types/           # TypeScript types
+│   │   ├── database.types.ts
 │   │   └── index.ts
+│   ├── utils/           # Helper utilities
+│   │   └── supabase.utils.ts
+│   ├── validators/      # Request validation
+│   │   ├── auth.validator.ts
+│   │   └── task.validator.ts
 │   └── index.ts         # Application entry point
+├── supabase/
+│   └── migrations/      # Database migrations
 ├── .env                 # Environment variables
 ├── package.json
 └── tsconfig.json
@@ -80,15 +92,31 @@ bun/
 GET /health
 ```
 
+### Authentication
+
+```
+POST   /api/auth/signup           # Create new user account
+POST   /api/auth/login            # Login and get JWT tokens
+POST   /api/auth/logout           # Logout (requires auth)
+POST   /api/auth/reset-password   # Request password reset
+POST   /api/auth/update-password  # Update password (requires auth)
+POST   /api/auth/refresh          # Refresh access token
+GET    /api/auth/profile          # Get user profile (requires auth)
+```
+
+See [AUTH_INTEGRATION.md](./AUTH_INTEGRATION.md) for detailed authentication documentation.
+
 ### Tasks
 
 ```
-GET    /api/tasks       # Get all tasks
-GET    /api/tasks/:id   # Get a single task
-POST   /api/tasks       # Create a new task
-PUT    /api/tasks/:id   # Update a task
-DELETE /api/tasks/:id   # Delete a task
+GET    /api/tasks       # Get all tasks (optional auth)
+GET    /api/tasks/:id   # Get a single task (optional auth)
+POST   /api/tasks       # Create a new task (optional auth)
+PUT    /api/tasks/:id   # Update a task (optional auth)
+DELETE /api/tasks/:id   # Delete a task (optional auth)
 ```
+
+**Note:** Tasks API supports optional authentication. If authenticated, tasks are associated with the user.
 
 ## 🔧 Environment Variables
 
@@ -125,6 +153,10 @@ DELETE /api/tasks/:id   # Delete a task
 - ✅ PostgreSQL database
 - ✅ Row Level Security (RLS)
 - ✅ Auto-updating timestamps
+- ✅ **User authentication (JWT)**
+- ✅ **Login, signup, password reset**
+- ✅ **Protected routes**
+- ✅ **User-specific data isolation**
 
 ## 📝 Development Tips
 
@@ -133,6 +165,16 @@ DELETE /api/tasks/:id   # Delete a task
 - Error handling is centralized in middleware
 - Use `asyncHandler` wrapper for async route handlers
 - Environment variables are validated on startup
+- Authentication uses JWT tokens from Supabase
+- See [AUTH_QUICK_REFERENCE.md](./AUTH_QUICK_REFERENCE.md) for auth commands
+
+## 📚 Documentation
+
+- **[AUTH_INTEGRATION.md](./AUTH_INTEGRATION.md)** - Complete authentication guide
+- **[AUTH_QUICK_REFERENCE.md](./AUTH_QUICK_REFERENCE.md)** - Auth quick reference
+- **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)** - Supabase setup instructions
+- **[SUPABASE_INTEGRATION.md](./SUPABASE_INTEGRATION.md)** - Supabase integration details
+- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - Quick command reference
 
 ## 🤝 Contributing
 
