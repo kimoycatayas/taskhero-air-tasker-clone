@@ -10,17 +10,46 @@ export interface Task {
   created_at: string;
   updated_at: string;
   user_id: string | null;
+  // New fields from Create Task form
+  date_type?: "on_date" | "before_date" | "flexible";
+  task_date?: string | null;
+  location_address?: string | null;
+  location_lat?: number | null;
+  location_lng?: number | null;
+  budget_min?: number | null;
+  budget_max?: number | null;
+  budget_currency?: string;
+  // Offer count
+  offer_count?: number;
 }
 
 export interface CreateTaskRequest {
   title: string;
   description?: string;
+  // New fields from Create Task form
+  date_type?: "on_date" | "before_date" | "flexible";
+  task_date?: string | null;
+  location_address?: string | null;
+  location_lat?: number | null;
+  location_lng?: number | null;
+  budget_min?: number | null;
+  budget_max?: number | null;
+  budget_currency?: string;
 }
 
 export interface UpdateTaskRequest {
   title?: string;
   description?: string;
   status?: "pending" | "in_progress" | "completed";
+  // New fields from Create Task form
+  date_type?: "on_date" | "before_date" | "flexible";
+  task_date?: string | null;
+  location_address?: string | null;
+  location_lat?: number | null;
+  location_lng?: number | null;
+  budget_min?: number | null;
+  budget_max?: number | null;
+  budget_currency?: string;
 }
 
 export interface ApiResponse<T> {
@@ -56,6 +85,21 @@ class TasksApi {
 
     if (!response.ok) {
       throw new Error(result.message || "Failed to fetch tasks");
+    }
+
+    return result.data || [];
+  }
+
+  async getMyTasks(): Promise<Task[]> {
+    const response = await fetch(`${API_BASE_URL}/api/tasks/my-tasks`, {
+      method: "GET",
+      headers: this.getHeaders(),
+    });
+
+    const result: ApiResponse<Task[]> = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to fetch your tasks");
     }
 
     return result.data || [];
@@ -130,6 +174,44 @@ class TasksApi {
       const result: ApiResponse<void> = await response.json();
       throw new Error(result.message || "Failed to delete task");
     }
+  }
+
+  async completeTask(id: string): Promise<Task> {
+    const response = await fetch(`${API_BASE_URL}/api/tasks/${id}/complete`, {
+      method: "POST",
+      headers: this.getHeaders(),
+    });
+
+    const result: ApiResponse<Task> = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to complete task");
+    }
+
+    if (!result.data) {
+      throw new Error("Failed to complete task");
+    }
+
+    return result.data;
+  }
+
+  async declineTask(id: string): Promise<Task> {
+    const response = await fetch(`${API_BASE_URL}/api/tasks/${id}/decline`, {
+      method: "POST",
+      headers: this.getHeaders(),
+    });
+
+    const result: ApiResponse<Task> = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to decline task");
+    }
+
+    if (!result.data) {
+      throw new Error("Failed to decline task");
+    }
+
+    return result.data;
   }
 }
 

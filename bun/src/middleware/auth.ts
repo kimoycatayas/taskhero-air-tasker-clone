@@ -64,4 +64,3 @@ export const optionalAuth = async (
     next();
   }
 };
-

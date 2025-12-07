@@ -63,4 +63,3 @@ router.post("/refresh", asyncHandler(refreshToken));
 router.get("/profile", requireAuth, asyncHandler(getProfile));
 
 export default router;
-

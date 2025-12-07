@@ -5,7 +5,8 @@ export const PAGE_ROUTES = {
   forgotPassword: "/forgot-password",
   dashboard: "/dashboard",
   tasks: "/tasks",
-  tasksMap: "/tasks/map",
+  createTask: "/tasks/create",
   taskDetails: (id: string) => `/tasks/${id}`,
+  myBidTask: (taskId: string) => `/my-bids/${taskId}`,
   howItWorks: "/how-it-works",
 };

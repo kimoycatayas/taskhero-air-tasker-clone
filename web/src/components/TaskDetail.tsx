@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import MakeOfferModal from "./MakeOfferModal";
+
 interface TaskDetailProps {
   task: {
     id: string;
@@ -18,6 +21,13 @@ interface TaskDetailProps {
 }
 
 export default function TaskDetail({ task }: TaskDetailProps) {
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  const handleOfferSuccess = () => {
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 5000);
+  };
   if (!task) {
     return (
       <div className="h-full flex items-center justify-center text-gray-400">
@@ -43,6 +53,37 @@ export default function TaskDetail({ task }: TaskDetailProps) {
 
   return (
     <div className="h-full overflow-y-auto">
+      {/* Success Message */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span>Offer submitted successfully!</span>
+        </div>
+      )}
+
+      {/* Make Offer Modal */}
+      {task && (
+        <MakeOfferModal
+          taskId={task.id}
+          taskTitle={task.title}
+          taskBudget={task.budget}
+          isOpen={isOfferModalOpen}
+          onClose={() => setIsOfferModalOpen(false)}
+          onSuccess={handleOfferSuccess}
+        />
+      )}
       {/* Header */}
       <div className="border-b border-gray-200 p-6">
         <div className="flex items-center gap-2 mb-6">
@@ -172,20 +213,6 @@ export default function TaskDetail({ task }: TaskDetailProps) {
       <div className="p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Details</h2>
         <p className="text-gray-700 leading-relaxed mb-6">{task.details}</p>
-
-        <button className="text-blue-600 text-sm font-medium">Less ^</button>
-      </div>
-
-      {/* Tabs */}
-      <div className="px-6">
-        <div className="flex border-b border-gray-200">
-          <button className="flex-1 py-3 text-center font-semibold text-white bg-[#0D1B3E] rounded-t-lg">
-            Offers
-          </button>
-          <button className="flex-1 py-3 text-center font-semibold text-gray-600 bg-gray-100 rounded-t-lg">
-            Questions
-          </button>
-        </div>
       </div>
 
       {/* Budget Card */}
@@ -195,7 +222,10 @@ export default function TaskDetail({ task }: TaskDetailProps) {
           <div className="text-5xl font-bold text-gray-900 mb-6">
             ${task.budget}
           </div>
-          <button className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mb-3">
+          <button
+            onClick={() => setIsOfferModalOpen(true)}
+            className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition mb-3"
+          >
             Make an offer
           </button>
           <details className="text-left">
@@ -239,4 +269,3 @@ export default function TaskDetail({ task }: TaskDetailProps) {
     </div>
   );
 }
-

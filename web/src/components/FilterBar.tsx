@@ -12,10 +12,13 @@ interface FilterBarProps {
   }) => void;
 }
 
-export default function FilterBar({ onSearch, onFilterChange }: FilterBarProps) {
+export default function FilterBar({
+  onSearch,
+  onFilterChange,
+}: FilterBarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("Category");
-  const [location, setLocation] = useState("50km Davao City 8000 & remotely");
+  const [location, setLocation] = useState("Within 10km");
   const [priceRange, setPriceRange] = useState("Any price");
   const [otherFilters, setOtherFilters] = useState("Other filters");
   const [sort, setSort] = useState("Sort");
@@ -90,9 +93,6 @@ export default function FilterBar({ onSearch, onFilterChange }: FilterBarProps) 
             }}
             className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white cursor-pointer whitespace-nowrap flex-shrink-0 text-black"
           >
-            <option value="50km Davao City 8000 & remotely">
-              50km Davao City 8000 & remotely
-            </option>
             <option value="10km">Within 10km</option>
             <option value="25km">Within 25km</option>
             <option value="50km">Within 50km</option>
@@ -150,4 +150,3 @@ export default function FilterBar({ onSearch, onFilterChange }: FilterBarProps) 
     </div>
   );
 }
-

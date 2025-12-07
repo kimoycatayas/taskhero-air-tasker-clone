@@ -32,33 +32,3 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
-/* MapLibre GL styles */
-.maplibregl-map {
-  font: 12px/20px Helvetica Neue, Arial, Helvetica, sans-serif;
-  overflow: hidden;
-  position: relative;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  text-align: left;
-}
-
-.maplibregl-canvas-container {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.maplibregl-canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.maplibregl-ctrl {
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  border-radius: 4px;
-}
-
